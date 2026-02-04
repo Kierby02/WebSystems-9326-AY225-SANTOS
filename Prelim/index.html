@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bacoor City - Official Local Government Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a4d2e;
+            --primary-light: #2d7a4a;
+            --accent: #d4a574;
+            --accent-bright: #f4c542;
+            --text-dark: #1a1a1a;
+            --text-light: #ffffff;
+            --bg-light: #fafaf8;
+            --bg-cream: #f5f1e8;
+            --border: #e0ddd4;
+            --shadow: rgba(26, 77, 46, 0.12);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Work Sans', sans-serif;
+            color: var(--text-dark);
+            background: var(--bg-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--text-light);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+        
+        .header-top {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .logo {
+            width: 70px;
+            height: 70px;
+            background: var(--text-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 2rem;
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .city-name h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+        
+        .city-name p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .search-bar {
+            flex: 0 1 400px;
+            position: relative;
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Work Sans', sans-serif;
+            font-size: 0.95rem;
+            background: rgba(255,255,255,0.95);
+            transition: all 0.3s ease;
+        }
+        
+        .search-bar input:focus {
+            outline: none;
+            background: var(--text-light);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        
+        /* Navigation */
+        nav {
+            background: var(--text-light);
+            border-bottom: 3px solid var(--accent);
+        }
+        
+        .nav-links {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            gap: 0.5rem;
+            list-style: none;
+        }
+        
+        .nav-links li a {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-links li a:hover,
+        .nav-links li a.active {
+            color: var(--primary);
+            background: var(--bg-cream);
+        }
+        
+        .nav-links li a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent-bright);
+        }
+        
+        /* Main Content */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+        
+        .page-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .page-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--text-light);
+            padding: 5rem 3rem;
+            border-radius: 20px;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+        }
+        
+        .hero h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+        
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .card {
+            background: var(--text-light);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px var(--shadow);
+            border-color: var(--accent);
+        }
+        
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--text-light);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--primary);
+        }
+        
+        .card p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        /* About Section */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+        
+        .about-content {
+            background: var(--text-light);
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+        
+        .about-content h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .about-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .stat-box {
+            background: var(--bg-cream);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-bright);
+        }
+        
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        
+        /* Departments */
+        .dept-filter {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .dept-filter input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            font-family: 'Work Sans', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .dept-filter input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .dept-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .dept-item {
+            background: var(--text-light);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 2px 10px var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .dept-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+        
+        .dept-item h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .dept-item p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        /* Services Section */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .service-card {
+            background: var(--text-light);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px var(--shadow);
+        }
+        
+        .service-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--text-light);
+            padding: 2rem;
+        }
+        
+        .service-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .service-body {
+            padding: 2rem;
+        }
+        
+        .service-btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.75rem 2rem;
+            background: var(--primary);
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .service-btn:hover {
+            background: var(--primary-light);
+            transform: translateX(5px);
+        }
+        
+        /* News Feed */
+        .news-feed {
+            display: grid;
+            gap: 2rem;
+        }
+        
+        .news-item {
+            background: var(--text-light);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px var(--shadow);
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            transition: all 0.3s ease;
+            opacity: 0;
+            animation: slideIn 0.5s ease forwards;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .news-item:nth-child(1) { animation-delay: 0.1s; }
+        .news-item:nth-child(2) { animation-delay: 0.2s; }
+        .news-item:nth-child(3) { animation-delay: 0.3s; }
+        
+        .news-item:hover {
+            box-shadow: 0 8px 30px var(--shadow);
+        }
+        
+        .news-image {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 3rem;
+        }
+        
+        .news-content {
+            padding: 2rem;
+        }
+        
+        .news-date {
+            display: inline-block;
+            background: var(--bg-cream);
+            color: var(--primary);
+            padding: 0.35rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        
+        .news-content h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.75rem;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+        
+        /* Contact Form */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-family: 'Work Sans', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+        
+        .error-message {
+            color: #d32f2f;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        
+        .form-group.error input,
+        .form-group.error textarea,
+        .form-group.error select {
+            border-color: #d32f2f;
+        }
+        
+        .form-group.error .error-message {
+            display: block;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--text-light);
+            padding: 1rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Work Sans', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--shadow);
+        }
+        
+        .contact-info {
+            background: var(--text-light);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px var(--shadow);
+            height: fit-content;
+        }
+        
+        .contact-item {
+            padding: 1.5rem;
+            background: var(--bg-cream);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        .contact-item h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .modal-content {
+            background: var(--text-light);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: var(--bg-cream);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            background: var(--primary);
+            color: var(--text-light);
+            transform: rotate(90deg);
+        }
+        
+        .modal h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        /* Section Headers */
+        .section-header {
+            margin-bottom: 2rem;
+        }
+        
+        .section-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .section-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--primary);
+            color: var(--text-light);
+            padding: 3rem 2rem 1.5rem;
+            margin-top: 4rem;
+        }
+        
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-section p,
+        .footer-section a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-section a:hover {
+            color: var(--accent-bright);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            opacity: 0.8;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-top {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .search-bar {
+                width: 100%;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .hero h2 {
+                font-size: 2.5rem;
+            }
+            
+            .about-grid,
+            .contact-grid,
+            .news-item {
+                grid-template-columns: 1fr;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-top">
+            <div class="logo-section">
+                <div class="logo">BC</div>
+                <div class="city-name">
+                    <h1>Bacoor City</h1>
+                    <p>Local Government Unit Portal</p>
+                </div>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="deptSearch" placeholder="Search departments or services...">
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <ul class="nav-links">
+            <li><a href="#home" class="nav-link active" data-page="home">Home</a></li>
+            <li><a href="#about" class="nav-link" data-page="about">About Bacoor City</a></li>
+            <li><a href="#departments" class="nav-link" data-page="departments">City Departments</a></li>
+            <li><a href="#services" class="nav-link" data-page="services">Public Services</a></li>
+            <li><a href="#news" class="nav-link" data-page="news">Announcements</a></li>
+            <li><a href="#contact" class="nav-link" data-page="contact">Contact Us</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Home Page -->
+        <section id="home" class="page-section active">
+            <div class="hero">
+                <div class="hero-content">
+                    <h2>Welcome to Bacoor City</h2>
+                    <p>Your gateway to efficient and accessible local government services. Building a progressive and sustainable community together.</p>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <h2>City Highlights</h2>
+                <p>Discover what makes Bacoor City a great place to live and thrive</p>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon">🏛️</div>
+                    <h3>Rich Heritage</h3>
+                    <p>Bacoor City boasts a vibrant history as one of the key sites of the Philippine Revolution, blending tradition with modernity.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🌱</div>
+                    <h3>Growing Economy</h3>
+                    <p>Strategic location and business-friendly policies make Bacoor a hub for commerce and industrial development in Cavite.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">👥</div>
+                    <h3>Vibrant Community</h3>
+                    <p>Home to diverse and engaged citizens working together to build a sustainable and inclusive future for all.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📱</div>
+                    <h3>Digital Services</h3>
+                    <p>Access government services online with our citizen-centered digital platforms for convenience and efficiency.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Page -->
+        <section id="about" class="page-section">
+            <div class="section-header">
+                <h2>About Bacoor City</h2>
+                <p>Learn about our history, vision, and mission for a better tomorrow</p>
+            </div>
+
+            <div class="about-grid">
+                <div class="about-content">
+                    <h3>Our History</h3>
+                    <p>Bacoor City, located in the province of Cavite, Philippines, has a rich and storied past dating back to the Spanish colonial period. The city played a crucial role in the Philippine Revolution, serving as a strategic location for revolutionary forces.</p>
+                    <p>Officially became a city on June 23, 2012, through Republic Act No. 10160, transforming from a first-class municipality into a component city. Today, Bacoor stands as one of the fastest-growing cities in the region, balancing urban development with cultural preservation.</p>
+                </div>
+                
+                <div class="about-content">
+                    <h3>Vision & Mission</h3>
+                    <p><strong>Vision:</strong> A progressive, sustainable, and resilient Bacoor City where every citizen enjoys quality of life, inclusive growth, and meaningful participation in governance.</p>
+                    <p><strong>Mission:</strong> To deliver excellent public service through transparent governance, innovative programs, and collaborative partnerships that empower communities and promote social equity.</p>
+                </div>
+            </div>
+
+            <div class="about-stats">
+                <div class="stat-box">
+                    <div class="stat-number">700K+</div>
+                    <div class="stat-label">Population</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">73</div>
+                    <div class="stat-label">Barangays</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">52.4</div>
+                    <div class="stat-label">Square Kilometers</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">2012</div>
+                    <div class="stat-label">Year Cityhood</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Departments Page -->
+        <section id="departments" class="page-section">
+            <div class="section-header">
+                <h2>City Departments & Offices</h2>
+                <p>Find the right department for your needs</p>
+            </div>
+
+            <div class="dept-filter">
+                <input type="text" id="filterDept" placeholder="Filter departments by name or service...">
+            </div>
+
+            <div class="dept-list" id="deptList">
+                <div class="dept-item" data-name="Office of the Mayor" data-service="executive leadership governance">
+                    <h4>Office of the Mayor</h4>
+                    <p>Executive leadership and city governance</p>
+                </div>
+                <div class="dept-item" data-name="City Planning and Development Office" data-service="urban planning zoning development">
+                    <h4>City Planning and Development Office</h4>
+                    <p>Urban planning, zoning, and development coordination</p>
+                </div>
+                <div class="dept-item" data-name="City Treasurer's Office" data-service="tax collection revenue">
+                    <h4>City Treasurer's Office</h4>
+                    <p>Tax collection and revenue management</p>
+                </div>
+                <div class="dept-item" data-name="City Health Office" data-service="health medical services">
+                    <h4>City Health Office</h4>
+                    <p>Public health programs and medical services</p>
+                </div>
+                <div class="dept-item" data-name="City Engineer's Office" data-service="infrastructure construction public works">
+                    <h4>City Engineer's Office</h4>
+                    <p>Infrastructure development and public works</p>
+                </div>
+                <div class="dept-item" data-name="City Social Welfare and Development Office" data-service="social welfare assistance">
+                    <h4>City Social Welfare and Development Office</h4>
+                    <p>Social services and community welfare programs</p>
+                </div>
+                <div class="dept-item" data-name="City Assessor's Office" data-service="property assessment valuation">
+                    <h4>City Assessor's Office</h4>
+                    <p>Property assessment and valuation services</p>
+                </div>
+                <div class="dept-item" data-name="Business Permits and Licensing Office" data-service="business permits licenses">
+                </div>
+                <div class="dept-item" data-name="City Environment and Natural Resources Office" data-service="environment conservation sustainability">
+                    <h4>City Environment and Natural Resources Office</h4>
+                    <p>Environmental protection and sustainability initiatives</p>
+                </div>
+                <div class="dept-item" data-name="City Tourism Office" data-service="tourism cultural events">
+                    <h4>City Tourism Office</h4>
+                    <p>Tourism promotion and cultural events management</p>
+                </div>
+                <div class="dept-item" data-name="Public Employment Service Office" data-service="employment jobs recruitment">
+                    <h4>Public Employment Service Office</h4>
+                    <p>Employment services and job placement assistance</p>
+                </div>
+            </div>
+        </section>         <h4>Business Permits and Licensing Office</h4>
+                    <p>Business registration and permits processing</p>
+                </div>
+                <div class="dept-item" data-name="City Agriculture Office" data-service="agriculture farming">
+                    <h4>City Agriculture Office</h4>
+                    <p>Agricultural programs and farmer support</p>
+           
+
+        <!-- Services Page -->
+        <section id="services" class="page-section">
+            <div class="section-header">
+                <h2>Public Services & Online Services</h2>
+                <p>Access government services conveniently</p>
+            </div>
+
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-header">
+                        <h3>Business Registration</h3>
+                        <p>Register your new business</p>
+                    </div>
+                    <div class="service-body">
+                        <p>Apply for business permits and licenses online. Streamlined process for new and renewing businesses.</p>
+                        <a href="#" class="service-btn" onclick="openServiceModal('Business Registration'); return false;">Apply Now</a>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-header">
+                        <h3>Building Permits</h3>
+                        <p>Construction and renovation permits</p>
+                    </div>
+                    <div class="service-body">
+                        <p>Submit building permit applications for construction, renovation, or repair projects in Bacoor City.</p>
+                        <a href="#" class="service-btn" onclick="openServiceModal('Building Permit'); return false;">Request Permit</a>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-header">
+                        <h3>Health Services</h3>
+                        <p>Medical assistance programs</p>
+                    </div>
+                    <div class="service-body">
+                        <p>Access health programs including immunization, maternal care, and medical assistance for residents.</p>
+                        <a href="#" class="service-btn" onclick="openServiceModal('Health Services'); return false;">Learn More</a>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-header">
+                        <h3>Civil Registry Services</h3>
+                        <p>Certificates and records</p>
+                    </div>
+                    <div class="service-body">
+                        <p>Request birth, marriage, and death certificates. Fast and efficient document processing services.</p>
+                        <a href="#" class="service-btn" onclick="openServiceModal('Civil Registry'); return false;">Request Documents</a>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-header">
+                        <h3>Tax Payment</h3>
+                        <p>Pay local taxes online</p>
+                    </div>
+                    <div class="service-body">
+                        <p>Convenient online payment of real property tax, business tax, and other local government fees.</p>
+                        <a href="#" class="service-btn" onclick="openServiceModal('Tax Payment'); return false;">Pay Taxes</a>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-header">
+                        <h3>Community Complaint</h3>
+                        <p>Report issues and concerns</p>
+                    </div>
+                    <div class="service-body">
+                        <p>Submit complaints or feedback about city services, infrastructure, or community concerns.</p>
+                        <a href="#" class="service-btn" onclick="openServiceModal('Community Complaint'); return false;">File Complaint</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- News/Announcements Page -->
+        <section id="news" class="page-section">
+            <div class="section-header">
+                <h2>Announcements & News</h2>
+                <p>Stay updated with the latest from Bacoor City</p>
+            </div>
+
+            <div class="news-feed" id="newsFeed">
+                <!-- News items will be dynamically loaded here -->
+            </div>
+        </section>
+
+        <!-- Contact Page -->
+        <section id="contact" class="page-section">
+            <div class="section-header">
+                <h2>Contact Us / Citizen Feedback</h2>
+                <p>Get in touch with our offices or share your feedback</p>
+            </div>
+
+            <div class="contact-grid">
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="fullName">Full Name *</label>
+                        <input type="text" id="fullName" name="fullName" required>
+                        <span class="error-message">Please enter your full name</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" required>
+                        <span class="error-message">Please enter a valid email address</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inquiryType">Type of Inquiry *</label>
+                        <select id="inquiryType" name="inquiryType" required>
+                            <option value="">Select inquiry type</option>
+                            <option value="general">General Inquiry</option>
+                            <option value="complaint">Complaint</option>
+                            <option value="feedback">Feedback/Suggestion</option>
+                            <option value="service">Service Request</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <span class="error-message">Please select an inquiry type</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Message *</label>
+                        <textarea id="message" name="message" required></textarea>
+                        <span class="error-message">Please enter your message (minimum 10 characters)</span>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Submit Inquiry</button>
+                </form>
+
+                <div class="contact-info">
+                    <h3 style="font-family: 'Playfair Display', serif; color: var(--primary); margin-bottom: 1.5rem;">Contact Information</h3>
+                    
+                    <div class="contact-item">
+                        <h4>Main Office</h4>
+                        <p>Bacoor City Hall<br>
+                        Tirona Highway, Bacoor City<br>
+                        Cavite, Philippines 4102</p>
+                    </div>
+
+                    <div class="contact-item">
+                        <h4>Phone</h4>
+                        <p>Tel: (046) 417-1234<br>
+                        Hotline: (046) 417-5678</p>
+                    </div>
+
+                    <div class="contact-item">
+                        <h4>Email</h4>
+                        <p>info@bacoor.gov.ph<br>
+                        mayor@bacoor.gov.ph</p>
+                    </div>
+
+                    <div class="contact-item">
+                        <h4>Office Hours</h4>
+                        <p>Monday - Friday<br>
+                        8:00 AM - 5:00 PM</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Bacoor City</h3>
+                <p>Official Local Government Unit Portal</p>
+                <p>Serving the community with excellence and integrity.</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="#home">Home</a>
+                <a href="#about">About Us</a>
+                <a href="#departments">Departments</a>
+                <a href="#services">Services</a>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p>Tirona Highway, Bacoor City<br>
+                Cavite, Philippines 4102</p>
+                <p>Tel: (046) 417-1234</p>
+                <p>Email: info@bacoor.gov.ph</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Office Hours</h3>
+                <p>Monday to Friday<br>8:00 AM - 5:00 PM</p>
+                <p style="margin-top: 1rem;">Saturday & Sunday<br>Closed</p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 Bacoor City Local Government Unit. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Service Modal -->
+    <div id="serviceModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h3 id="modalTitle">Service Request</h3>
+            
+            <form id="serviceForm">
+                <div class="form-group">
+                    <label for="serviceName">Full Name *</label>
+                    <input type="text" id="serviceName" required>
+                    <span class="error-message">Please enter your name</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="serviceEmail">Email Address *</label>
+                    <input type="email" id="serviceEmail" required>
+                    <span class="error-message">Please enter a valid email</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="servicePhone">Contact Number *</label>
+                    <input type="tel" id="servicePhone" required>
+                    <span class="error-message">Please enter your contact number</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="serviceDetails">Request Details *</label>
+                    <textarea id="serviceDetails" required></textarea>
+                    <span class="error-message">Please provide details (minimum 20 characters)</span>
+                </div>
+
+                <button type="submit" class="submit-btn">Submit Request</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Announcement Modal -->
+    <div id="announcementModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeAnnouncementModal()">&times;</button>
+            <h3 id="announcementTitle">Announcement</h3>
+            <div id="announcementContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // LocalStorage for user preferences
+        const APP_KEY = 'bacoor_lgu_';
+        
+        // Save user preference
+        function savePreference(key, value) {
+            try {
+                localStorage.setItem(APP_KEY + key, JSON.stringify(value));
+            } catch (e) {
+                console.log('Storage not available');
+            }
+        }
+        
+        // Get user preference
+        function getPreference(key) {
+            try {
+                const value = localStorage.getItem(APP_KEY + key);
+                return value ? JSON.parse(value) : null;
+            } catch (e) {
+                return null;
+            }
+        }
+        
+        // Track recently viewed pages
+        function trackPageView(page) {
+            let recentPages = getPreference('recent_pages') || [];
+            recentPages = recentPages.filter(p => p !== page);
+            recentPages.unshift(page);
+            recentPages = recentPages.slice(0, 5);
+            savePreference('recent_pages', recentPages);
+        }
+
+        // Navigation functionality
+        const navLinks = document.querySelectorAll('.nav-link');
+        const pageSections = document.querySelectorAll('.page-section');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetPage = link.dataset.page;
+                
+                // Update active states
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                
+                pageSections.forEach(section => section.classList.remove('active'));
+                document.getElementById(targetPage).classList.add('active');
+                
+                // Track page view
+                trackPageView(targetPage);
+                
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        // Department search/filter
+        const deptSearch = document.getElementById('deptSearch');
+        const filterDept = document.getElementById('filterDept');
+        const deptItems = document.querySelectorAll('.dept-item');
+
+        function filterDepartments(searchTerm) {
+            const term = searchTerm.toLowerCase().trim();
+            
+            deptItems.forEach(item => {
+                const name = item.dataset.name.toLowerCase();
+                const service = item.dataset.service.toLowerCase();
+                
+                if (name.includes(term) || service.includes(term)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        deptSearch.addEventListener('input', (e) => {
+            filterDepartments(e.target.value);
+        });
+
+        filterDept.addEventListener('input', (e) => {
+            filterDepartments(e.target.value);
+        });
+
+        // Dynamic news feed
+        const newsData = [
+            {
+                title: "City Government Launches New Digital Services Platform",
+                date: "February 1, 2026",
+                content: "Bacoor City officially launched its enhanced digital services platform, making it easier for citizens to access government services online. The new system includes online payment options, document requests, and real-time tracking of applications.",
+                icon: "📱"
+            },
+            {
+                title: "Free Medical Mission for Senior Citizens",
+                date: "January 28, 2026",
+                content: "The City Health Office announces a free medical mission for senior citizens on February 15-16, 2026. Services include general checkup, dental care, and free medicines. Registration is now open at all barangay health centers.",
+                icon: "🏥"
+            },
+            {
+                title: "Infrastructure Development: New Public Market Construction Begins",
+                date: "January 25, 2026",
+                content: "Construction of the new modern public market in Barangay Talaba has officially begun. The project aims to provide better facilities for vendors and shoppers, expected to be completed by December 2026.",
+                icon: "🏗️"
+            },
+            {
+                title: "Environmental Initiative: Tree Planting Drive this Weekend",
+                date: "January 20, 2026",
+                content: "Join us for a city-wide tree planting activity on February 8, 2026. The City Environment Office invites all residents to participate in our goal to plant 10,000 trees across Bacoor City. Register at the Environment Office.",
+                icon: "🌳"
+            }
+        ];
+
+        function loadNews() {
+            const newsFeed = document.getElementById('newsFeed');
+            newsFeed.innerHTML = '';
+            
+            newsData.forEach((news, index) => {
+                const newsItem = document.createElement('div');
+                newsItem.className = 'news-item';
+                newsItem.innerHTML = `
+                    <div class="news-image">${news.icon}</div>
+                    <div class="news-content">
+                        <span class="news-date">${news.date}</span>
+                        <h3>${news.title}</h3>
+                        <p>${news.content}</p>
+                    </div>
+                `;
+                newsItem.style.cursor = 'pointer';
+                newsItem.addEventListener('click', () => openAnnouncementModal(news));
+                newsFeed.appendChild(newsItem);
+            });
+        }
+
+        // Modal functions
+        function openServiceModal(serviceName) {
+            const modal = document.getElementById('serviceModal');
+            const modalTitle = document.getElementById('modalTitle');
+            modalTitle.textContent = serviceName + ' Request';
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('serviceModal');
+            modal.classList.remove('active');
+            document.getElementById('serviceForm').reset();
+        }
+
+        function openAnnouncementModal(news) {
+            const modal = document.getElementById('announcementModal');
+            const title = document.getElementById('announcementTitle');
+            const content = document.getElementById('announcementContent');
+            
+            title.textContent = news.title;
+            content.innerHTML = `
+                <p style="color: #666; margin-bottom: 1rem;">${news.icon} ${news.date}</p>
+                <p style="line-height: 1.8;">${news.content}</p>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        function closeAnnouncementModal() {
+            const modal = document.getElementById('announcementModal');
+            modal.classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            const serviceModal = document.getElementById('serviceModal');
+            const announcementModal = document.getElementById('announcementModal');
+            
+            if (e.target === serviceModal) {
+                closeModal();
+            }
+            if (e.target === announcementModal) {
+                closeAnnouncementModal();
+            }
+        });
+
+        // Form validation
+        function validateForm(form) {
+            let isValid = true;
+            const formGroups = form.querySelectorAll('.form-group');
+            
+            formGroups.forEach(group => {
+                const input = group.querySelector('input, textarea, select');
+                group.classList.remove('error');
+                
+                if (input.hasAttribute('required')) {
+                    if (!input.value.trim()) {
+                        group.classList.add('error');
+                        isValid = false;
+                    } else if (input.type === 'email') {
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if (!emailRegex.test(input.value)) {
+                            group.classList.add('error');
+                            isValid = false;
+                        }
+                    } else if (input.tagName === 'TEXTAREA' && input.value.trim().length < 10) {
+                        group.classList.add('error');
+                        isValid = false;
+                    }
+                }
+            });
+            
+            return isValid;
+        }
+
+        // Contact form submission
+        document.getElementById('contactForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (validateForm(e.target)) {
+                const formData = {
+                    fullName: document.getElementById('fullName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    inquiryType: document.getElementById('inquiryType').value,
+                    message: document.getElementById('message').value,
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Save to localStorage
+                let inquiries = getPreference('inquiries') || [];
+                inquiries.unshift(formData);
+                savePreference('inquiries', inquiries);
+                
+                alert('Thank you for your inquiry! We will get back to you within 24-48 hours.');
+                e.target.reset();
+            }
+        });
+
+        // Service form submission
+        document.getElementById('serviceForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const serviceNameInput = document.getElementById('serviceName');
+            const serviceEmailInput = document.getElementById('serviceEmail');
+            const servicePhoneInput = document.getElementById('servicePhone');
+            const serviceDetailsInput = document.getElementById('serviceDetails');
+            
+            // Validate service form
+            let isValid = true;
+            const formGroups = e.target.querySelectorAll('.form-group');
+            
+            formGroups.forEach(group => {
+                const input = group.querySelector('input, textarea');
+                group.classList.remove('error');
+                
+                if (!input.value.trim()) {
+                    group.classList.add('error');
+                    isValid = false;
+                } else if (input.type === 'email') {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(input.value)) {
+                        group.classList.add('error');
+                        isValid = false;
+                    }
+                } else if (input.id === 'serviceDetails' && input.value.trim().length < 20) {
+                    group.classList.add('error');
+                    isValid = false;
+                }
+            });
+            
+            if (isValid) {
+                const serviceData = {
+                    service: document.getElementById('modalTitle').textContent,
+                    name: serviceNameInput.value,
+                    email: serviceEmailInput.value,
+                    phone: servicePhoneInput.value,
+                    details: serviceDetailsInput.value,
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Save to localStorage
+                let requests = getPreference('service_requests') || [];
+                requests.unshift(serviceData);
+                savePreference('service_requests', requests);
+                
+                alert('Your service request has been submitted successfully! We will process your request shortly.');
+                closeModal();
+            }
+        });
+
+        // Initialize news feed on load
+        loadNews();
+
+        // Track initial page view
+        trackPageView('home');
+
+        // Log user preferences on console for demonstration
+        console.log('Recent pages viewed:', getPreference('recent_pages'));
+    </script>
+</body>
+</html>
