@@ -1,4 +1,5 @@
-* { box-sizing: border-box; scroll-behavior: smooth; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
@@ -23,7 +24,7 @@ header {
 nav {
   display: flex;
   justify-content: center;
-  gap: 28px;
+  gap: 26px;
   background: #07243b;
   padding: 14px;
   position: sticky;
@@ -36,7 +37,6 @@ nav a {
   font-weight: 600;
   font-size: 14px;
   border-bottom: 2px solid transparent;
-  padding-bottom: 4px;
 }
 
 nav a.active,
@@ -81,9 +81,7 @@ nav a:hover {
   transition: .25s;
 }
 
-.card:hover {
-  transform: translateY(-4px);
-}
+.card:hover { transform: translateY(-4px); }
 
 /* ABOUT */
 
