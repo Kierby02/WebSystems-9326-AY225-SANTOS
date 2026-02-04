@@ -1,1 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bacoor City LGU Portal</title>
+<link rel="stylesheet" href="style.css">
+</head>
 
+<body>
+
+<header>
+  <div class="topbar">
+    <h1>Bacoor City LGU Portal</h1>
+    <p>Official Local Government Website</p>
+  </div>
+
+  <nav id="navbar">
+    <a href="#home">Home</a>
+    <a href="#about">About</a>
+    <a href="#departments">Departments</a>
+    <a href="#services">Services</a>
+    <a href="#news">News</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
+<!-- HOME -->
+<section id="home" class="section">
+  <h2>Welcome</h2>
+  <p>
+    Providing transparent governance, digital public services, and responsive
+    community programs for every Bacooreño citizen.
+  </p>
+
+  <div class="cards">
+    <div class="card">Online Permits</div>
+    <div class="card">Health Programs</div>
+    <div class="card">Emergency Updates</div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="section alt">
+  <h2>About Bacoor City</h2>
+
+  <div class="about-grid">
+    <div class="about-card">
+      <h3>History</h3>
+      <p>
+        Bacoor City is one of the oldest and most historically significant cities
+        in Cavite and played a key role in the Philippine Revolution. It has grown
+        from an agricultural town into a highly urbanized gateway city.
+      </p>
+    </div>
+
+    <div class="about-card">
+      <h3>Vision</h3>
+      <p>
+        A modern, resilient, and sustainable urban center empowered by technology
+        and transparent governance.
+      </p>
+    </div>
+
+    <div class="about-card">
+      <h3>Mission</h3>
+      <p>
+        Deliver efficient and inclusive public services while promoting safe and
+        livable communities.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- DEPARTMENTS -->
+<section id="departments" class="section">
+  <h2>Departments</h2>
+  <input type="text" id="deptSearch" placeholder="Search department">
+  <ul id="deptList"></ul>
+</section>
+
+<!-- SERVICES -->
+<section id="services" class="section alt">
+  <h2>Services</h2>
+  <input type="text" id="serviceSearch" placeholder="Search service">
+  <ul id="serviceList"></ul>
+</section>
+
+<!-- NEWS -->
+<section id="news" class="section">
+  <h2>Announcements</h2>
+  <div id="newsContainer" class="cards"></div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="section alt">
+  <h2>Citizen Inquiry</h2>
+
+  <form id="inquiryForm">
+    <input id="name" placeholder="Full Name">
+    <input id="email" placeholder="Email">
+    <textarea id="message" placeholder="Message"></textarea>
+    <button type="submit">Submit</button>
+  </form>
+
+  <p id="formMsg"></p>
+</section>
+
+<footer>
+  © Bacoor City LGU Portal — Academic Project
+</footer>
+
+<!-- MODAL -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <span id="closeModal">&times;</span>
+    <h3 id="modalTitle"></h3>
+    <p id="modalBody"></p>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
