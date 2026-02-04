@@ -1,4 +1,3 @@
-// DATA
 const departments = [
 "Mayor’s Office","Health Office","Engineering",
 "Social Welfare","Business Permit","DRRM Office"
@@ -14,8 +13,7 @@ const news = [
 {title:"Road Repair", body:"Main Ave closed Feb 5–8."}
 ];
 
-// RENDER
-function render(list, id){
+function render(list,id){
   const ul=document.getElementById(id);
   ul.innerHTML="";
   list.forEach(x=>{
@@ -29,15 +27,14 @@ function render(list, id){
 render(departments,"deptList");
 render(services,"serviceList");
 
-// SEARCH
 deptSearch.oninput=e=>{
   render(departments.filter(d=>d.toLowerCase().includes(e.target.value.toLowerCase())),"deptList");
 };
+
 serviceSearch.oninput=e=>{
   render(services.filter(d=>d.toLowerCase().includes(e.target.value.toLowerCase())),"serviceList");
 };
 
-// NEWS
 news.forEach(n=>{
   const c=document.createElement("div");
   c.className="card";
@@ -46,15 +43,14 @@ news.forEach(n=>{
   newsContainer.appendChild(c);
 });
 
-// MODAL
 function openModal(t,b){
   modal.style.display="block";
   modalTitle.textContent=t;
   modalBody.textContent=b;
 }
+
 closeModal.onclick=()=>modal.style.display="none";
 
-// FORM
 inquiryForm.onsubmit=e=>{
   e.preventDefault();
   if(!name.value||!email.value||!message.value){
@@ -62,10 +58,8 @@ inquiryForm.onsubmit=e=>{
     return;
   }
   formMsg.textContent="Submitted successfully";
-  localStorage.setItem("user",name.value);
 };
 
-// ACTIVE NAV
 const sections=document.querySelectorAll("section");
 const navLinks=document.querySelectorAll("nav a");
 
