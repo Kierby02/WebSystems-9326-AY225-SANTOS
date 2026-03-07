@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game Informer Review Scraper</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,400&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --void:      #0a0a0c;
+      --deep:      #111118;
+      --surface:   #18181f;
+      --card:      #1f1f28;
+      --border:    #2e2e3e;
+      --gi-red:    #e8001c;
+      --gi-red2:   #ff2a42;
+      --gi-gold:   #f5c542;
+      --gi-cyan:   #00c8e0;
+      --text:      #e8e8f0;
+      --muted:     #6a6a80;
+      --subtle:    #3a3a50;
+      --row-hover: #252530;
+      --glow-red:  0 0 30px rgba(232,0,28,.3);
+      --glow-gold: 0 0 20px rgba(245,197,66,.2);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: var(--void);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Scanline overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,.08) 2px,
+        rgba(0,0,0,.08) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Header */
+    .masthead {
+      background: var(--void);
+      border-bottom: 3px solid var(--gi-red);
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .masthead::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gi-red), var(--gi-red2), transparent);
+      box-shadow: var(--glow-red);
+    }
+    .masthead-inner {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+    }
+    .gi-logo-block {
+      background: var(--gi-red);
+      padding: 22px 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+      clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%);
+      padding-right: 44px;
+    }
+    .gi-logo-block .gi-icon {
+      font-size: 2.4rem;
+      line-height: 1;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,.4));
+    }
+    .gi-logo-block .gi-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: .08em;
+      color: white;
+      line-height: 1.1;
+      text-shadow: 0 2px 8px rgba(0,0,0,.4);
+    }
+    .gi-logo-block .gi-sub {
+      font-size: .55rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.75);
+    }
+    .masthead-titles {
+      padding: 22px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .masthead-titles h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      letter-spacing: .06em;
+      color: var(--text);
+      line-height: 1;
+    }
+    .masthead-titles h1 .accent { color: var(--gi-red); }
+    .masthead-titles .tagline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .82rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+    .masthead-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      padding: 22px 0;
+    }
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(232,0,28,.12);
+      border: 1px solid rgba(232,0,28,.3);
+      border-radius: 2px;
+      padding: 6px 14px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .75rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--gi-red2);
+    }
+    .live-dot {
+      width: 7px; height: 7px;
+      background: var(--gi-red);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--gi-red);
+      animation: pulse-dot 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--gi-red); }
+      50% { opacity: .5; box-shadow: 0 0 3px var(--gi-red); }
+    }
+
+    /* Ticker bar */
+    .ticker-bar {
+      background: var(--gi-red);
+      overflow: hidden;
+      height: 28px;
+      display: flex;
+      align-items: center;
+    }
+    .ticker-label {
+      background: #a0001a;
+      padding: 0 14px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: .85rem;
+      letter-spacing: .12em;
+      color: white;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .ticker-scroll {
+      overflow: hidden;
+      flex: 1;
+    }
+    .ticker-text {
+      display: inline-block;
+      white-space: nowrap;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .78rem;
+      letter-spacing: .1em;
+      color: rgba(255,255,255,.92);
+      padding-left: 100%;
+      animation: ticker 28s linear infinite;
+    }
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* Main content */
+    .page {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 36px 24px 80px;
+    }
+
+    /* Control panel */
+    .control-strip {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--gi-red);
+      padding: 18px 24px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .control-info {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1rem;
+      color: var(--muted);
+      letter-spacing: .04em;
+      flex: 1 1 200px;
+    }
+    .control-info strong {
+      color: var(--gi-gold);
+      font-weight: 600;
+    }
+    .btn-scrape {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: .1em;
+      color: white;
+      background: var(--gi-red);
+      border: none;
+      padding: 12px 32px;
+      cursor: pointer;
+      clip-path: polygon(0 0, 100% 0, 96% 100%, 0 100%);
+      padding-right: 40px;
+      transition: background .2s, box-shadow .2s;
+      position: relative;
+      white-space: nowrap;
+    }
+    .btn-scrape:hover {
+      background: var(--gi-red2);
+      box-shadow: var(--glow-red);
+    }
+    .btn-scrape:disabled {
+      background: var(--subtle);
+      cursor: not-allowed;
+      box-shadow: none;
+      clip-path: none;
+      padding-right: 32px;
+    }
+
+    /* Status bar */
+    #status-bar {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .95rem;
+      letter-spacing: .05em;
+      border-left: 3px solid;
+    }
+    #status-bar.loading {
+      display: flex;
+      background: rgba(0,200,224,.06);
+      border-color: var(--gi-cyan);
+      color: var(--gi-cyan);
+    }
+    #status-bar.error {
+      display: flex;
+      background: rgba(232,0,28,.08);
+      border-color: var(--gi-red);
+      color: #ff6a7a;
+    }
+    #status-bar.done {
+      display: flex;
+      background: rgba(245,197,66,.06);
+      border-color: var(--gi-gold);
+      color: var(--gi-gold);
+    }
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Stats */
+    #stats-row {
+      display: none;
+      gap: 2px;
+      margin-bottom: 28px;
+    }
+    #stats-row.visible { display: flex; }
+    .stat-card {
+      flex: 1 1 100px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--gi-red);
+      padding: 18px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gi-red), transparent);
+      opacity: .4;
+    }
+    .stat-card .num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.8rem;
+      color: var(--gi-red);
+      display: block;
+      line-height: 1;
+      text-shadow: 0 0 20px rgba(232,0,28,.4);
+    }
+    .stat-card .lbl {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .68rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* Filter bar */
+    #filter-bar {
+      display: none;
+      margin-bottom: 16px;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    #filter-bar.visible { display: flex; }
+    #filter-bar input {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .95rem;
+      letter-spacing: .05em;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      padding: 9px 14px;
+      outline: none;
+      flex: 1 1 200px;
+      transition: border-color .2s;
+    }
+    #filter-bar input::placeholder { color: var(--muted); }
+    #filter-bar input:focus { border-color: var(--gi-red); }
+    #result-count {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .82rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-left: auto;
+    }
+
+    /* Table */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--deep);
+      font-size: .88rem;
+    }
+    thead {
+      background: var(--void);
+      border-bottom: 2px solid var(--gi-red);
+    }
+    thead th {
+      padding: 14px 16px;
+      text-align: left;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: .9rem;
+      letter-spacing: .14em;
+      color: var(--muted);
+      white-space: nowrap;
+      cursor: pointer;
+      transition: color .2s;
+      user-select: none;
+    }
+    thead th:hover { color: var(--text); }
+    thead th.asc, thead th.desc { color: var(--gi-red); }
+    thead th .sort-icon { opacity: .5; margin-left: 4px; }
+    thead th.asc .sort-icon::after { content: ' ▲'; }
+    thead th.desc .sort-icon::after { content: ' ▼'; }
+    thead th:not(.asc):not(.desc) .sort-icon::after { content: ' ⇅'; }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background .15s;
+      animation: rowIn .35s ease both;
+    }
+    tbody tr:nth-child(odd) { background: var(--surface); }
+    tbody tr:nth-child(even) { background: var(--deep); }
+    tbody tr:hover { background: var(--row-hover); }
+    @keyframes rowIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+
+    td { padding: 13px 16px; vertical-align: top; color: var(--text); }
+
+    /* Score badge */
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      background: var(--void);
+      border: 2px solid var(--gi-red);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      color: var(--gi-red);
+      box-shadow: 0 0 14px rgba(232,0,28,.2);
+      flex-shrink: 0;
+    }
+    .score-badge.gold {
+      border-color: var(--gi-gold);
+      color: var(--gi-gold);
+      box-shadow: 0 0 14px rgba(245,197,66,.2);
+    }
+    .score-badge.na {
+      border-color: var(--subtle);
+      color: var(--muted);
+      font-size: .75rem;
+      box-shadow: none;
+    }
+
+    td.title-col {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: .03em;
+      max-width: 260px;
+    }
+    td.title-col a {
+      color: var(--text);
+      text-decoration: none;
+      transition: color .15s;
+      display: block;
+    }
+    td.title-col a:hover { color: var(--gi-red); }
+    td.title-col .review-sub {
+      font-size: .72rem;
+      color: var(--muted);
+      font-weight: 400;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    .platform-badge {
+      display: inline-block;
+      background: var(--void);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .68rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .2rem .7rem;
+      margin: .15rem .15rem;
+    }
+
+    .genre-tag {
+      display: inline-block;
+      background: rgba(0,200,224,.08);
+      border: 1px solid rgba(0,200,224,.2);
+      color: var(--gi-cyan);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .68rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: .2rem .6rem;
+      margin: .15rem .1rem;
+    }
+
+    .summary-cell {
+      max-width: 300px;
+      font-size: .82rem;
+      line-height: 1.5;
+      color: #a0a0b8;
+    }
+
+    .na { color: var(--muted); font-style: italic; font-size: .82rem; }
+
+    /* Empty state */
+    #empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 80px 24px;
+      color: var(--muted);
+      gap: 16px;
+      background: var(--deep);
+    }
+    #empty-state .icon {
+      font-size: 3.5rem;
+      filter: grayscale(1);
+      opacity: .4;
+    }
+    #empty-state p {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.05rem;
+      letter-spacing: .06em;
+      color: var(--muted);
+      text-align: center;
+      max-width: 400px;
+    }
+    #empty-state .big-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      color: var(--subtle);
+      letter-spacing: .1em;
+    }
+
+    /* Export bar */
+    #export-bar {
+      display: none;
+      margin-top: 20px;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    #export-bar.visible { display: flex; }
+    .btn-export {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .88rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 8px 18px;
+      cursor: pointer;
+      transition: all .18s;
+    }
+    .btn-export:hover {
+      background: var(--gi-red);
+      border-color: var(--gi-red);
+      color: white;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      color: var(--subtle);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .78rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+    }
+    footer span { color: var(--gi-red); }
+  </style>
+</head>
+<body>
+
+<!-- Masthead -->
+<div class="masthead">
+  <div class="masthead-inner">
+    <div class="gi-logo-block">
+      <span class="gi-icon">🎮</span>
+      <div>
+        <div class="gi-brand">Game<br>Informer</div>
+        <div class="gi-sub">Review Scraper</div>
+      </div>
+    </div>
+    <div class="masthead-titles">
+      <h1>LATEST <span class="accent">REVIEWS</span></h1>
+      <div class="tagline">First 10 results</div>
+    </div>
+    <div class="masthead-right">
+      <div class="live-badge">
+        <span class="live-dot"></span> Live Scrape
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ticker -->
+<div class="ticker-bar">
+  <div class="ticker-label">BREAKING</div>
+  <div class="ticker-scroll">
+    <span class="ticker-text">
+      Auto-discovers review links from gameinformer.com/reviews — scrapes first 10 — no hardcoded URLs or data — click the button to begin — scores, platforms, genres and summaries extracted live —
+    </span>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Control strip -->
+  <div class="control-strip">
+    <div class="control-info">
+      Targets <strong>gameinformer.com/reviews</strong> — discovers links, scrapes first <strong>10 reviews</strong>.
+      All data extracted live. No hardcoded game names.
+    </div>
+    <button class="btn-scrape" id="scrapeBtn">▶ DISCOVER &amp; SCRAPE 10 REVIEWS</button>
+  </div>
+
+  <div id="status-bar"></div>
+
+  <!-- Stats -->
+  <div id="stats-row">
+    <div class="stat-card"><span class="num" id="stat-total">0</span><span class="lbl">Reviews Scraped</span></div>
+    <div class="stat-card"><span class="num" id="stat-scored">—</span><span class="lbl">With Score</span></div>
+    <div class="stat-card"><span class="num" id="stat-platforms">—</span><span class="lbl">With Platforms</span></div>
+  </div>
+
+  <!-- Filter bar -->
+  <div id="filter-bar">
+    <input type="text" id="search-input" placeholder="Filter by title, platform, genre..." />
+    <span id="result-count"></span>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap" id="table-wrap">
+    <div id="empty-state">
+      <span class="icon">🕹️</span>
+      <div class="big-text">NO DATA LOADED</div>
+      <p>Click "Discover & Scrape 10 Reviews" to pull the latest Game Informer reviews.</p>
+    </div>
+    <table id="games-table" style="display:none;">
+      <thead>
+        <tr>
+          <th style="width:52px">Score</th>
+          <th onclick="sortBy('title')" id="th-title">Title <span class="sort-icon"></span></th>
+          <th onclick="sortBy('release')" id="th-release">Date <span class="sort-icon"></span></th>
+          <th>Summary</th>
+          <th onclick="sortBy('platforms')" id="th-platforms">Platform(s) <span class="sort-icon"></span></th>
+          <th onclick="sortBy('reviewer')" id="th-reviewer">Reviewer <span class="sort-icon"></span></th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <div id="export-bar">
+    <button class="btn-export" onclick="exportCSV()">⬇ CSV</button>
+    <button class="btn-export" onclick="exportJSON()">⬇ JSON</button>
+  </div>
+
+  <footer>
+    Data sourced live from <span>gameinformer.com</span> — scraped via CORS proxy — for personal/educational use only
+  </footer>
+</div>
+
+<script>
+  // GI listing page — all review data lives here, no sub-page scraping needed
+  const LISTING_URL = "https://gameinformer.com/reviews";
+  const MAX_REVIEWS = 10;
+
+  let allGames = [];
+  let sortKey = 'title';
+  let sortDir = 'asc';
+
+  const scrapeBtn    = document.getElementById('scrapeBtn');
+  const statusBar    = document.getElementById('status-bar');
+  const statsRow     = document.getElementById('stats-row');
+  const filterBar    = document.getElementById('filter-bar');
+  const emptyState   = document.getElementById('empty-state');
+  const gamesTable   = document.getElementById('games-table');
+  const tableBody    = document.getElementById('table-body');
+  const exportBar    = document.getElementById('export-bar');
+  const searchInput  = document.getElementById('search-input');
+  const resultCount  = document.getElementById('result-count');
+  const statTotal    = document.getElementById('stat-total');
+  const statScored   = document.getElementById('stat-scored');
+  const statPlatforms= document.getElementById('stat-platforms');
+
+  // Proxy fallback chain
+  const PROXIES = [
+    {
+      name: 'corsproxy.io',
+      buildUrl: (t) => `https://corsproxy.io/?${encodeURIComponent(t)}`,
+      extract: async (r) => r.text(),
+    },
+    {
+      name: 'allorigins.win',
+      buildUrl: (t) => `https://api.allorigins.win/get?url=${encodeURIComponent(t)}`,
+      extract: async (r) => { const j = await r.json(); return j.contents; },
+    },
+    {
+      name: 'codetabs.com',
+      buildUrl: (t) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(t)}`,
+      extract: async (r) => r.text(),
+    },
+  ];
+
+  async function fetchWithFallback(url, onProg) {
+    const errors = [];
+    for (const proxy of PROXIES) {
+      if (onProg) onProg(`Trying ${proxy.name}…`);
+      try {
+        const res = await fetch(proxy.buildUrl(url), { signal: AbortSignal.timeout(15000) });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const html = await proxy.extract(res);
+        if (!html || html.length < 500) throw new Error('Empty or too-short response');
+        return html;
+      } catch (e) {
+        errors.push(`${proxy.name}: ${e.message}`);
+      }
+    }
+    throw new Error(`All proxies failed:\n${errors.join('\n')}`);
+  }
+
+  function setStatus(type, msg) {
+    statusBar.className = type;
+    statusBar.innerHTML = type === 'loading'
+      ? `<span class="spinner"></span>${msg}`
+      : msg;
+  }
+
+  function esc(str) {
+    return String(str || '')
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+
+  function txt(el) {
+    return el ? el.textContent.trim().replace(/\s+/g,' ') : null;
+  }
+
+  // ---------------------------------------------------------------
+  // Parse all review cards directly from the listing page HTML.
+  // GI's listing page renders score, title, summary, date, reviewer
+  // inline — no sub-page requests needed.
+  // ---------------------------------------------------------------
+  function parseListingPage(doc) {
+    const BASE = 'https://gameinformer.com';
+    const results = [];
+    const seen = new Set();
+
+    // Each review card contains a score number, an h2 link, a summary paragraph,
+    // a byline with author name and date. We anchor on links to /review/...
+    const reviewLinks = Array.from(doc.querySelectorAll('a[href^="/review/"]'));
+
+    for (const a of reviewLinks) {
+      const href = a.getAttribute('href');
+      const fullUrl = BASE + href;
+
+      // Deduplicate — the listing page repeats featured items
+      if (seen.has(fullUrl)) continue;
+      seen.add(fullUrl);
+
+      // Walk up to find the card container (shared ancestor with score/summary/byline)
+      // GI wraps each card in a <div> or <article>; we look up to 6 levels
+      let card = a;
+      for (let i = 0; i < 6; i++) {
+        card = card.parentElement;
+        if (!card) break;
+        const cardText = card.textContent || '';
+        // A real card will have both a score-like number and a "by" byline
+        if (/\bby\b/i.test(cardText) && /\b\d+(?:\.\d+)?\b/.test(cardText)) break;
+      }
+      if (!card) card = a.closest('div, article, li') || a.parentElement;
+
+      const cardText = card ? card.textContent : '';
+
+      // Title: strip "Review – Subtitle" suffix pattern
+      let title = txt(a.querySelector('h2, h3')) || txt(a) || '';
+      title = title.replace(/\s*[–\-|].*$/, '').trim();
+      if (!title) {
+        title = href.split('/')[2]?.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase()) || 'Unknown';
+      }
+
+      // Score: look for a standalone number like "9", "7.75", "9.75" near the card
+      let score = 'N/A';
+      const scoreMatch = cardText.match(/\b(10|[1-9](?:\.\d{1,2})?)\b/);
+      if (scoreMatch) {
+        const n = parseFloat(scoreMatch[1]);
+        if (n >= 1 && n <= 10) score = String(n);
+      }
+
+      // Summary: the paragraph of descriptive text (not the title, not the byline)
+      let summary = 'N/A';
+      const paras = card ? Array.from(card.querySelectorAll('p')) : [];
+      for (const p of paras) {
+        const t = p.textContent.trim();
+        if (t.length > 40 && !/^\s*by\s/i.test(t) && !/^\d/.test(t)) {
+          summary = t.slice(0, 260) + (t.length > 260 ? '…' : '');
+          break;
+        }
+      }
+      // Fallback: grab a text chunk from cardText that looks like a sentence
+      if (summary === 'N/A') {
+        const m = cardText.match(/[A-Z][^.!?]{40,200}[.!?]/);
+        if (m) summary = m[0].trim();
+      }
+
+      // Reviewer: "by Kyle Hilliard" pattern
+      let reviewer = 'N/A';
+      const byMatch = cardText.match(/\bby\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
+      if (byMatch) reviewer = byMatch[1].trim();
+
+      // Date: "Mon DD, YYYY" or "Mon DD YYYY"
+      let release = 'N/A';
+      const dateMatch = cardText.match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2},?\s+\d{4}\b/i);
+      if (dateMatch) release = dateMatch[0];
+
+      // Platforms: detect from full card text or URL context
+      const found = [];
+      if (/PS5|PlayStation\s*5/i.test(cardText)) found.push('PS5');
+      if (/PS4|PlayStation\s*4/i.test(cardText)) found.push('PS4');
+      if (/Xbox Series/i.test(cardText)) found.push('XSX');
+      if (/Xbox One/i.test(cardText)) found.push('Xbox One');
+      if (/Switch 2/i.test(cardText)) found.push('Switch 2');
+      else if (/Nintendo Switch|Switch/i.test(cardText)) found.push('Switch');
+      if (/\bPC\b|Steam|Windows/i.test(cardText)) found.push('PC');
+      const platforms = found.length ? found.join(', ') : 'N/A';
+
+      results.push({ title, score, release, summary, platforms, reviewer, url: fullUrl });
+      if (results.length >= MAX_REVIEWS) break;
+    }
+
+    return results;
+  }
+
+  // --- Main scrape: fetch listing page once, parse everything from it ---
+  async function scrapeReviews() {
+    setStatus('loading', 'Connecting to Game Informer…');
+    scrapeBtn.disabled = true;
+    emptyState.style.display = 'flex';
+    gamesTable.style.display = 'none';
+    exportBar.classList.remove('visible');
+    filterBar.classList.remove('visible');
+    statsRow.classList.remove('visible');
+
+    try {
+      const html = await fetchWithFallback(LISTING_URL, (m) => setStatus('loading', m));
+      setStatus('loading', 'Parsing review cards…');
+
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      const results = parseListingPage(doc);
+
+      if (!results.length) {
+        throw new Error(
+          'Could not find any review cards on the page. ' +
+          'The site layout may have changed or the proxy blocked the response.'
+        );
+      }
+
+      allGames = results;
+
+      statTotal.textContent = allGames.length;
+      statScored.textContent = allGames.filter(g => g.score !== 'N/A').length;
+      statPlatforms.textContent = allGames.filter(g => g.platforms !== 'N/A').length;
+
+      statsRow.classList.add('visible');
+      filterBar.classList.add('visible');
+      exportBar.classList.add('visible');
+
+      searchInput.value = '';
+      sortKey = 'title'; sortDir = 'asc';
+      updateSortHeaders();
+      renderTable();
+
+      setStatus('done', `✓ Loaded ${allGames.length} Game Informer reviews.`);
+      emptyState.style.display = 'none';
+      gamesTable.style.display = 'table';
+    } catch (err) {
+      setStatus('error', `✗ ${err.message}`);
+      console.error(err);
+    } finally {
+      scrapeBtn.disabled = false;
+    }
+  }
+
+  // --- Render ---
+  window.renderTable = function() {
+    const q = searchInput.value.toLowerCase();
+    let rows = allGames.filter(g => {
+      if (!q) return true;
+      return g.title.toLowerCase().includes(q) ||
+             g.platforms.toLowerCase().includes(q) ||
+             g.genre.toLowerCase().includes(q) ||
+             g.reviewer.toLowerCase().includes(q);
+    });
+
+    rows.sort((a, b) => {
+      let av = a[sortKey] || '', bv = b[sortKey] || '';
+      av = av.toLowerCase(); bv = bv.toLowerCase();
+      return sortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+    });
+
+    resultCount.textContent = `${rows.length} / ${allGames.length} reviews`;
+
+    if (!rows.length && allGames.length) {
+      tableBody.innerHTML = '';
+      gamesTable.style.display = 'none';
+      emptyState.style.display = 'flex';
+      emptyState.querySelector('.big-text').textContent = 'NO MATCHES';
+      emptyState.querySelector('p').textContent = 'No reviews match your filter.';
+      return;
+    }
+
+    tableBody.innerHTML = rows.map((g, i) => {
+      // Score badge styling
+      const scoreNum = parseFloat(g.score);
+      const scoreClass = isNaN(scoreNum) ? 'na' : (scoreNum >= 9 ? 'gold' : '');
+      const scoreDisplay = g.score === 'N/A' ? 'N/A' : g.score.replace('/10','');
+      const scoreBadge = `<div class="score-badge ${scoreClass}">${esc(scoreDisplay)}</div>`;
+
+      // Platforms
+      const platHtml = g.platforms !== 'N/A'
+        ? g.platforms.split(',').map(p => `<span class="platform-badge">${esc(p.trim())}</span>`).join('')
+        : '<span class="na">N/A</span>';
+
+      const delay = Math.min(i * 40, 500);
+
+      return `
+        <tr style="animation-delay:${delay}ms">
+          <td style="text-align:center">${scoreBadge}</td>
+          <td class="title-col">
+            <a href="${esc(g.url)}" target="_blank" rel="noopener">
+              ${esc(g.title)}
+            </a>
+            <div class="review-sub">Review</div>
+          </td>
+          <td style="white-space:nowrap;color:var(--muted);font-size:.82rem">${esc(g.release)}</td>
+          <td class="summary-cell">${esc(g.summary)}</td>
+          <td>${platHtml}</td>
+          <td style="font-size:.85rem;color:#8080a0;white-space:nowrap">${esc(g.reviewer)}</td>
+        </tr>`;
+    }).join('');
+
+    gamesTable.style.display = 'table';
+    emptyState.style.display = 'none';
+  };
+
+  window.sortBy = function(key) {
+    sortDir = (sortKey === key && sortDir === 'asc') ? 'desc' : 'asc';
+    sortKey = key;
+    updateSortHeaders();
+    renderTable();
+  };
+
+  function updateSortHeaders() {
+    ['title','release','platforms','reviewer'].forEach(k => {
+      const th = document.getElementById(`th-${k}`);
+      if (th) th.className = k === sortKey ? sortDir : '';
+    });
+  }
+
+  window.exportCSV = function() {
+    const hdr = ['Title','Score','Date','Summary','Platforms','Genre','Reviewer','URL'];
+    const rows = allGames.map(g => hdr.slice(0,-1).map(h => {
+      const key = h.toLowerCase().replace(' ','');
+      const map = {title:'title',score:'score',date:'release',summary:'summary',platforms:'platforms',genre:'genre',reviewer:'reviewer'};
+      return `"${(g[map[key]]||'').replace(/"/g,'""')}"`;
+    }).concat(`"${g.url}"`).join(','));
+    download([hdr.join(','),...rows].join('\n'), 'gameinformer_reviews.csv', 'text/csv');
+  };
+
+  window.exportJSON = function() {
+    download(JSON.stringify(allGames, null, 2), 'gameinformer_reviews.json', 'application/json');
+  };
+
+  function download(text, filename, type) {
+    const a = Object.assign(document.createElement('a'), {
+      href: URL.createObjectURL(new Blob([text], {type})),
+      download: filename
+    });
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  scrapeBtn.addEventListener('click', scrapeReviews);
+  searchInput.addEventListener('input', renderTable);
+</script>
+</body>
+</html>
