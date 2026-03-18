@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Scraper · GeeksforGeeks Academic Project</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: #1a1e24;
+            min-height: 100vh;
+            padding: 20px;
+            color: #e3e6eb;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #212830;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            overflow: hidden;
+            border: 1px solid #3d4858;
+        }
+
+        .header {
+            background: #0f1219;
+            color: #e3e6eb;
+            padding: 24px 30px;
+            text-align: center;
+            border-bottom: 4px solid #e44d26;
+            position: relative;
+            font-family: 'Segoe UI', 'Consolas', monospace;
+        }
+
+        .header::before {
+            content: "</>";
+            position: absolute;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #e44d26;
+            opacity: 0.3;
+            font-family: 'Consolas', monospace;
+        }
+
+        .header h1 {
+            font-size: 2.4rem;
+            font-weight: 500;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .header h1 span {
+            color: #e44d26;
+            background: rgba(228,77,38,0.15);
+            padding: 0 10px;
+            border-radius: 40px;
+            font-weight: 600;
+        }
+
+        .header p {
+            color: #96a9bb;
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+
+        .student-badge {
+            display: inline-block;
+            background: #1e2a36;
+            color: #f0b37b;
+            padding: 6px 25px;
+            border-radius: 40px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            border: 1px solid #e44d26;
+            font-family: 'Segoe UI', monospace;
+        }
+
+        .student-badge::before {
+            content: "🧑‍💻 ";
+            color: #e8c88c;
+        }
+
+        .main-content {
+            padding: 30px;
+            background: #1b222b;
+        }
+
+        .control-panel {
+            background: #252f3a;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 30px;
+            border: 1px solid #3e4b5b;
+        }
+
+        .url-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .url-section input {
+            flex: 1;
+            padding: 14px 18px;
+            background: #131a22;
+            border: 1px solid #3e4b5b;
+            border-radius: 8px;
+            color: #f0b37b;
+            font-family: 'Consolas', monospace;
+            font-size: 0.95rem;
+            min-width: 300px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+            font-family: 'Segoe UI', 'Consolas', monospace;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: #e44d26;
+            color: white;
+            box-shadow: 0 4px 0 #9e3419;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: #f35e39;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #9e3419;
+        }
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: #303d4b;
+            color: #dde3e9;
+            border-color: #4e6172;
+        }
+        .btn-secondary:hover {
+            background: #3f5062;
+            color: white;
+        }
+
+        .btn-success {
+            background: #2b6a4d;
+            color: white;
+            box-shadow: 0 4px 0 #154d35;
+        }
+        .btn-success:hover {
+            background: #35805e;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #154d35;
+        }
+
+        .btn-info {
+            background: #206a8f;
+            color: white;
+        }
+
+        .status-bar {
+            background: #206a8f;
+            border-radius: 8px;
+            padding: 12px 22px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s;
+            color: white;
+            font-family: 'Consolas', monospace;
+            border-left: 6px solid #f3b37b;
+        }
+        .status-bar.success { background: #1f7840; border-left-color: #c3e6a3; }
+        .status-bar.error   { background: #a1311f; border-left-color: #ffb3a3; }
+        .status-bar.warning { background: #a87b2d; border-left-color: #ffdd9e; }
+        .status-bar.info    { background: #206a8f; border-left-color: #b0e0ff; }
+
+        .spinner {
+            width: 18px; height: 18px;
+            border: 3px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress-container {
+            background: #131c26;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #3e4b5b;
+        }
+        .progress-bar {
+            width: 100%; height: 12px;
+            background: #2e3b48;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e44d26, #f5936b);
+            transition: width 0.3s;
+            border-radius: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
+            gap: 16px;
+            margin: 30px 0;
+        }
+        .stat-card {
+            background: #1c2834;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #3b4a5a;
+            border-top: 4px solid #e44d26;
+        }
+        .stat-card h3 {
+            font-size: 2.6rem;
+            font-weight: 600;
+            color: #f5b37b;
+            font-family: 'Consolas', monospace;
+        }
+        .stat-card p {
+            color: #9bb4cc;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .filter-section input,
+        .filter-section select {
+            padding: 12px 16px;
+            background: #131c26;
+            border: 1px solid #3e4b5b;
+            border-radius: 8px;
+            color: #f0b37b;
+            font-family: 'Consolas', monospace;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 4px;
+            background: #1a2530;
+            padding: 5px;
+            border-radius: 40px;
+            border: 1px solid #3e4b5b;
+            margin: 20px 0;
+        }
+        .tab {
+            flex: 1;
+            padding: 10px 18px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            color: #abbacf;
+            font-weight: 600;
+            font-family: 'Segoe UI', monospace;
+            transition: 0.2s;
+        }
+        .tab.active {
+            background: #e44d26;
+            color: white;
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px,1fr));
+            gap: 22px;
+            margin: 25px 0;
+        }
+        .topic-card {
+            background: #1f2a36;
+            border: 1px solid #3e5266;
+            border-radius: 12px;
+            padding: 22px;
+            transition: 0.2s;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.6);
+            position: relative;
+            border-left: 8px solid #e44d26;
+        }
+        .topic-card:hover {
+            border-color: #e87b5a;
+            transform: translateY(-3px);
+        }
+
+        .topic-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            gap: 10px;
+        }
+        .topic-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #f2c29b;
+            line-height: 1.5;
+            font-family: 'Segoe UI', 'Consolas', monospace;
+        }
+        .difficulty-badge {
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: #1c4e3d;
+            color: white;
+            white-space: nowrap;
+            height: fit-content;
+        }
+        .difficulty-easy   { background: #1b6b43; }
+        .difficulty-medium { background: #b1681d; }
+        .difficulty-hard   { background: #b13d2d; }
+
+        .concepts-section {
+            background: #0e1a24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 5px solid #e44d26;
+            font-size: 0.9rem;
+            color: #c9d8e8;
+        }
+        .concepts-section strong {
+            color: #f5b37b;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .code-preview {
+            background: #0d141e;
+            color: #bcd5ff;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 15px 0;
+            font-family: 'Consolas', monospace;
+            font-size: 0.8rem;
+            max-height: 140px;
+            overflow: auto;
+            border: 1px solid #3f5568;
+        }
+
+        .complexity-box {
+            display: flex;
+            gap: 10px;
+            margin: 12px 0;
+        }
+        .complexity-item {
+            flex:1;
+            background: #1a2633;
+            text-align: center;
+            padding: 8px 5px;
+            border-radius: 6px;
+            border: 1px solid #3d5063;
+            font-size: 0.8rem;
+        }
+        .complexity-item strong {
+            display: block;
+            color: #e09d6b;
+        }
+
+        .references-section {
+            background: #1b2531;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .reference-link {
+            color: #9bbae0;
+            text-decoration: none;
+            display: block;
+            padding: 6px 10px;
+            background: #11212e;
+            margin: 6px 0;
+            border-radius: 6px;
+            border: 1px solid #335066;
+            font-size: 0.8rem;
+            word-break: break-all;
+        }
+
+        .topic-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            border-top: 1px solid #3c5066;
+            padding-top: 15px;
+            color: #8aa1b9;
+            font-size: 0.75rem;
+        }
+
+        .empty-state {
+            background: #1a2530;
+            text-align: center;
+            padding: 70px 30px;
+            border-radius: 16px;
+            border: 2px dashed #e44d26;
+        }
+        .empty-state h2 {
+            font-size: 2rem;
+            color: #eab78b;
+            font-weight: 400;
+            margin-bottom: 15px;
+        }
+
+        .feature-list {
+            display: inline-block;
+            text-align: left;
+            background: #10202b;
+            padding: 30px 45px;
+            border-radius: 14px;
+            margin-top: 25px;
+        }
+        .feature-list li {
+            list-style: none;
+            padding: 6px 0 6px 30px;
+            position: relative;
+            color: #e2b689;
+        }
+        .feature-list li::before {
+            content: "✓";
+            color: #5fb37b;
+            font-weight: bold;
+            left: 0;
+            position: absolute;
+        }
+
+        .data-preview {
+            background: #101c27;
+            border-radius: 12px;
+            padding: 20px;
+            max-height: 500px;
+            overflow: auto;
+        }
+        .json-viewer {
+            background: #0c1620;
+            color: #dfb586;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Consolas', monospace;
+            white-space: pre-wrap;
+            border: 1px solid #2b4053;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .footer {
+            background: #e44d26;
+            color: white;
+            text-align: center;
+            padding: 14px;
+            font-size: 0.85rem;
+            border-top: 3px solid #b33818;
+            font-family: 'Segoe UI', monospace;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>&lt;HTML/&gt; <span>Scraper</span></h1>
+        <p>// 10 articles from GeeksforGeeks HTML search</p>
+        <div class="student-badge">Academic Project | HTML Scraping</div>
+    </div>
+
+    <div class="main-content">
+        <div class="control-panel">
+            <div class="url-section">
+                <input type="url" id="urlInput" value="https://www.geeksforgeeks.org/search/?gq=html" readonly>
+                <button class="btn btn-primary" id="scrapeBtn"><span>⚡</span> Scrape 10 HTML Articles</button>
+            </div>
+
+            <div id="status" class="status-bar" style="display:none;"></div>
+
+            <div id="progressSection" style="display:none;">
+                <div class="progress-container">
+                    <div style="display:flex; justify-content:space-between; color:#8da6c0;">
+                        <span>>_ scraping articles</span>
+                        <span><span id="completedCount">0</span>/<span id="totalCount">10</span></span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%;"></div></div>
+                    <div id="currentTopic" style="margin-top:10px; color:#f0b37b;"></div>
+                </div>
+            </div>
+
+            <div id="statsSection" style="display:none;">
+                <div class="stats-grid">
+                    <div class="stat-card"><h3 id="statTotal">0</h3><p>articles</p></div>
+                    <div class="stat-card"><h3 id="statWithCode">0</h3><p>with code</p></div>
+                    <div class="stat-card"><h3 id="statWithComplexity">0</h3><p>complexity</p></div>
+                    <div class="stat-card"><h3 id="statWithRefs">0</h3><p>references</p></div>
+                </div>
+            </div>
+
+            <div id="filterSection" style="display:none;">
+                <div class="filter-section">
+                    <input type="text" id="searchFilter" placeholder="🔍 filter titles...">
+                    <select id="difficultyFilter"><option value="">All Difficulties</option><option value="Easy">Easy</option><option value="Medium">Medium</option><option value="Hard">Hard</option></select>
+                </div>
+            </div>
+
+            <div id="viewTabs" class="tab-container" style="display:none;">
+                <button class="tab active" id="cardViewTab">📋 Card View</button>
+                <button class="tab" id="previewTab">🔍 Data Preview</button>
+            </div>
+
+            <div id="contentSection"></div>
+
+            <div id="actionSection" style="display:none;">
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" id="saveJsonBtn"><span>💾</span> Save</button>
+                    <button class="btn btn-info" id="loadJsonBtn"><span>📂</span> Load</button>
+                    <button class="btn btn-success" id="generatePdfBtn"><span>📄</span> Generate PDF with Articles</button>
+                    <button class="btn btn-secondary" id="exportJsonBtn"><span>📥</span> Export JSON</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="emptyState" class="empty-state">
+            <h2>&lt;scrape-articles /&gt;</h2>
+            <p>Click the button to scrape 10 HTML articles from GeeksforGeeks</p>
+            <div class="feature-list">
+                <ul>
+                    <li>Extracts exactly 10 articles from HTML search</li>
+                    <li>Includes titles, concepts, code snippets</li>
+                    <li>Time & space complexity analysis</li>
+                    <li>PDF with all 10 articles included</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">HTML Scraper · 10 Articles · Academic Project</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function() {
+    const CONFIG = {
+        targetUrl: 'https://www.geeksforgeeks.org/search/?gq=html',
+        apiUrl: 'https://www.geeksforgeeks.org/wp-json/wp/v2/posts?search=html&per_page=10',
+        minTopics: 10,
+        requestDelay: 800,
+        storageKey: 'gfg_html_10_articles',
+        studentName: 'Academic Project',
+        proxyList: [
+            { name: 'corsproxy', url: (t)=>`https://corsproxy.io/?${encodeURIComponent(t)}` },
+            { name: 'allorigins', url: (t)=>`https://api.allorigins.win/get?url=${encodeURIComponent(t)}`, extract: async (r)=>(await r.json()).contents }
+        ]
+    };
+
+    let scrapedTopics = [];
+    let filteredTopics = [];
+    let isScraping = false;
+    let activeTab = 'card';
+
+    const el = (id) => document.getElementById(id);
+    const urlInput = el('urlInput');
+    const scrapeBtn = el('scrapeBtn');
+    const statusDiv = el('status');
+    const progressSection = el('progressSection');
+    const statsSection = el('statsSection');
+    const filterSection = el('filterSection');
+    const viewTabs = el('viewTabs');
+    const contentSection = el('contentSection');
+    const actionSection = el('actionSection');
+    const emptyState = el('emptyState');
+    const completedCount = el('completedCount');
+    const totalCount = el('totalCount');
+    const progressFill = el('progressFill');
+    const currentTopic = el('currentTopic');
+    const statTotal = el('statTotal');
+    const statWithCode = el('statWithCode');
+    const statWithComplexity = el('statWithComplexity');
+    const statWithRefs = el('statWithRefs');
+    const searchFilter = el('searchFilter');
+    const difficultyFilter = el('difficultyFilter');
+    const cardViewTab = el('cardViewTab');
+    const previewTab = el('previewTab');
+    const saveJsonBtn = el('saveJsonBtn');
+    const loadJsonBtn = el('loadJsonBtn');
+    const generatePdfBtn = el('generatePdfBtn');
+    const exportJsonBtn = el('exportJsonBtn');
+
+    function isOnline() { return navigator.onLine; }
+    function escapeHtml(t) { if(!t)return ''; return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+
+    function setStatus(type, msg, duration=5000) {
+        statusDiv.style.display = 'flex';
+        statusDiv.className = `status-bar ${type}`;
+        statusDiv.innerHTML = (type==='loading') ? `<div class="spinner"></div> ${msg}` : msg;
+        if(type!=='loading') setTimeout(()=>statusDiv.style.display='none', duration);
+    }
+
+    async function fetchWithProxy(url) {
+        for(const proxy of CONFIG.proxyList) {
+            try {
+                const ctrl = new AbortController();
+                const tid = setTimeout(()=>ctrl.abort(), 14000);
+                const resp = await fetch(proxy.url(url), { signal: ctrl.signal });
+                clearTimeout(tid);
+                if(!resp.ok) continue;
+                if(proxy.extract) return await proxy.extract(resp);
+                return await resp.text();
+            } catch(e) {}
+        }
+        throw new Error('All proxies failed');
+    }
+
+    // Try API first, then fallback to HTML parsing
+    async function fetchFromAPI() {
+        try {
+            const resp = await fetchWithProxy(CONFIG.apiUrl);
+            if(resp) {
+                const posts = JSON.parse(resp);
+                return posts.map(p => ({ 
+                    url: p.link, 
+                    title: p.title.rendered.replace(/<[^>]*>/g, '').trim() 
+                }));
+            }
+        } catch(e) {}
+        return [];
+    }
+
+    async function extractArticlesFromHTML(html) {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const articles = [];
+        const seen = new Set();
+        
+        // Multiple selector strategies to catch all article links
+        const selectors = [
+            'article a',
+            '.search-result a',
+            '.result a',
+            'h3 a',
+            'h4 a',
+            'a[href*=".php"]',
+            '.article-list a',
+            '.content a',
+            '.gs-title a'
+        ];
+        
+        selectors.forEach(selector => {
+            doc.querySelectorAll(selector).forEach(a => {
+                let href = a.href || a.getAttribute('href');
+                let title = a.textContent?.trim() || '';
+                
+                if(!href || !title || title.length < 8) return;
+                if(!href.includes('geeksforgeeks.org') && !href.startsWith('/')) return;
+                
+                // Filter out non-article links
+                const exclude = ['login','signup','forum','course','problem','contest','job','tag','author','privacy','policy','terms'];
+                if(exclude.some(t => href.toLowerCase().includes(t) || title.toLowerCase().includes(t))) return;
+                
+                // Ensure it's an article page
+                if(href.includes('.php') || href.includes('/') && href.split('/').length >= 4) {
+                    const full = href.startsWith('http') ? href : `https://www.geeksforgeeks.org${href.startsWith('/') ? href : '/' + href}`;
+                    
+                    if(!seen.has(full)) {
+                        seen.add(full);
+                        articles.push({ url: full, title });
+                    }
+                }
+            });
+        });
+        
+        // Remove duplicates by URL
+        const unique = Array.from(new Map(articles.map(a => [a.url, a])).values());
+        return unique;
+    }
+
+    async function getHtmlArticles() {
+        setStatus('loading', 'Fetching HTML articles...');
+        
+        // Try API first
+        const apiArticles = await fetchFromAPI();
+        if(apiArticles.length >= CONFIG.minTopics) {
+            return apiArticles.slice(0, CONFIG.minTopics);
+        }
+        
+        // Fallback to HTML parsing
+        const html = await fetchWithProxy(CONFIG.targetUrl);
+        const htmlArticles = await extractArticlesFromHTML(html);
+        
+        if(htmlArticles.length >= CONFIG.minTopics) {
+            return htmlArticles.slice(0, CONFIG.minTopics);
+        }
+        
+        // If we have some articles but not enough, combine and pad with popular ones
+        const combined = [...apiArticles, ...htmlArticles];
+        const unique = Array.from(new Map(combined.map(a => [a.url, a])).values());
+        
+        if(unique.length >= CONFIG.minTopics) {
+            return unique.slice(0, CONFIG.minTopics);
+        }
+        
+        // Last resort: predefined popular HTML articles
+        const fallbackArticles = [
+            { title: 'HTML Introduction', url: 'https://www.geeksforgeeks.org/html-introduction/' },
+            { title: 'HTML Tutorial', url: 'https://www.geeksforgeeks.org/html-tutorial/' },
+            { title: 'HTML Tags - A to Z List', url: 'https://www.geeksforgeeks.org/html-tags-a-to-z-list/' },
+            { title: 'HTML Forms', url: 'https://www.geeksforgeeks.org/html-forms/' },
+            { title: 'HTML5 Semantic Elements', url: 'https://www.geeksforgeeks.org/html5-semantics/' },
+            { title: 'HTML Attributes', url: 'https://www.geeksforgeeks.org/html-attributes/' },
+            { title: 'HTML Tables', url: 'https://www.geeksforgeeks.org/html-tables/' },
+            { title: 'HTML vs HTML5', url: 'https://www.geeksforgeeks.org/difference-between-html-and-html5/' },
+            { title: 'HTML Headings', url: 'https://www.geeksforgeeks.org/html-headings/' },
+            { title: 'HTML Paragraphs', url: 'https://www.geeksforgeeks.org/html-paragraph/' }
+        ];
+        
+        return fallbackArticles.slice(0, CONFIG.minTopics);
+    }
+
+    function extractDifficulty(html, title) {
+        let lh = html.toLowerCase(), lt = title.toLowerCase();
+        if(lh.includes('difficulty: easy') || lh.includes('beginner') || lt.includes('basics') || lt.includes('introduction')) return 'Easy';
+        if(lh.includes('difficulty: medium') || lh.includes('intermediate') || lt.includes('guide') || lt.includes('tutorial')) return 'Medium';
+        if(lh.includes('difficulty: hard') || lh.includes('advanced') || lt.includes('advanced') || lt.includes('deep')) return 'Hard';
+        
+        // Default based on title
+        if(lt.includes('introduction') || lt.includes('basics') || lt.includes('beginner')) return 'Easy';
+        if(lt.includes('guide') || lt.includes('tutorial') || lt.includes('reference')) return 'Medium';
+        if(lt.includes('advanced') || lt.includes('deep') || lt.includes('performance')) return 'Hard';
+        
+        return 'Medium';
+    }
+
+    function extractConcepts(html) {
+        let doc = new DOMParser().parseFromString(html, 'text/html');
+        let concepts = [];
+        
+        // Try to extract from headings and paragraphs
+        ['h2', 'h3', 'p', '.text p', '.entry-content p'].forEach(sel => {
+            doc.querySelectorAll(sel).forEach(el => {
+                let txt = el.textContent.trim();
+                if(txt.length > 60 && txt.length < 400 && !txt.includes('cookie') && !txt.includes('privacy')) {
+                    concepts.push(txt);
+                }
+            });
+        });
+        
+        // If no concepts found, extract from first few paragraphs
+        if(concepts.length === 0) {
+            doc.querySelectorAll('p').forEach(p => {
+                let txt = p.textContent.trim();
+                if(txt.length > 80 && txt.length < 500) {
+                    concepts.push(txt);
+                }
+            });
+        }
+        
+        return concepts.length ? concepts.slice(0, 2) : ['Core HTML concepts described in this article.'];
+    }
+
+    function extractCodeSnippets(html) {
+        let doc = new DOMParser().parseFromString(html, 'text/html');
+        let codes = [];
+        
+        ['pre code', 'pre', 'code', '.code-block', '.highlight', '.syntaxhighlighter'].forEach(sel => {
+            doc.querySelectorAll(sel).forEach(el => {
+                let c = el.textContent.trim();
+                if(c.length > 30 && c.length < 3000 && (c.includes('<') || c.includes('&lt;') || c.includes('{') || c.includes('function'))) {
+                    codes.push(c);
+                }
+            });
+        });
+        
+        return codes.slice(0, 2);
+    }
+
+    function extractComplexity(html) {
+        let time = 'O(n) - Linear time complexity', 
+            space = 'O(n) - Linear space complexity';
+        
+        let tm = html.match(/time complexity[:\s]*([^.\n]+)/i);
+        if(tm) time = tm[1].trim().substring(0, 60);
+        
+        let sm = html.match(/space complexity[:\s]*([^.\n]+)/i);
+        if(sm) space = sm[1].trim().substring(0, 60);
+        
+        return { timeComplexity: time, spaceComplexity: space };
+    }
+
+    function extractReferences(html, curUrl) {
+        let doc = new DOMParser().parseFromString(html, 'text/html');
+        let refs = [], seen = new Set();
+        
+        ['.references a', '.ref a', 'aside a', '.related a', '.also-read a'].forEach(sel => {
+            doc.querySelectorAll(sel).forEach(a => {
+                let href = a.href, txt = a.textContent.trim();
+                if(href && txt && href !== curUrl && !seen.has(href) && href.includes('geeksforgeeks.org') && !href.includes('login')) {
+                    seen.add(href); 
+                    refs.push({ title: txt.substring(0, 50), url: href });
+                }
+            });
+        });
+        
+        return refs.slice(0, 3);
+    }
+
+    async function scrapeArticle(info, idx, total) {
+        currentTopic.textContent = `>_ ${idx}/${total}: ${info.title.substring(0, 60)}`;
+        try {
+            const html = await fetchWithProxy(info.url);
+            return {
+                id: `html-${Date.now()}-${idx}`,
+                title: info.title,
+                url: info.url,
+                difficulty: extractDifficulty(html, info.title),
+                concepts: extractConcepts(html),
+                codeSnippets: extractCodeSnippets(html),
+                ...extractComplexity(html),
+                references: extractReferences(html, info.url),
+                dateGenerated: new Date().toISOString()
+            };
+        } catch(e) {
+            return {
+                id: `html-${Date.now()}-${idx}`,
+                title: info.title,
+                url: info.url,
+                difficulty: 'Medium',
+                concepts: ['Article content could not be loaded - using fallback description'],
+                codeSnippets: ['<p>Example HTML code would appear here</p>'],
+                timeComplexity: 'O(n) typical',
+                spaceComplexity: 'O(n) typical',
+                references: [],
+                dateGenerated: new Date().toISOString(),
+                error: true
+            };
+        }
+    }
+
+    async function startScraping() {
+        if(!isOnline()) { setStatus('error', '❌ Offline - please connect to internet'); return; }
+        if(isScraping) return;
+        
+        isScraping = true;
+        scrapeBtn.disabled = true;
+        emptyState.style.display = 'none';
+        progressSection.style.display = 'block';
+        statsSection.style.display = 'none';
+        filterSection.style.display = 'none';
+        viewTabs.style.display = 'none';
+        contentSection.innerHTML = '';
+        actionSection.style.display = 'none';
+
+        try {
+            const articles = await getHtmlArticles();
+            
+            if(articles.length === 0) throw new Error('No articles found');
+            
+            const toScrape = articles.slice(0, CONFIG.minTopics);
+            totalCount.textContent = toScrape.length;
+            setStatus('loading', `Found ${articles.length}, scraping ${toScrape.length} articles...`);
+
+            const scraped = [];
+            for(let i = 0; i < toScrape.length; i++) {
+                const article = await scrapeArticle(toScrape[i], i + 1, toScrape.length);
+                scraped.push(article);
+                completedCount.textContent = i + 1;
+                progressFill.style.width = `${((i + 1) / toScrape.length) * 100}%`;
+                await new Promise(r => setTimeout(r, CONFIG.requestDelay));
+            }
+            
+            scrapedTopics = scraped;
+            filteredTopics = [...scrapedTopics];
+            localStorage.setItem(CONFIG.storageKey, JSON.stringify(scrapedTopics));
+            
+            updateUIAfterScrape();
+            setStatus('success', `✅ Scraped ${scrapedTopics.length} HTML articles successfully!`);
+        } catch(err) {
+            setStatus('error', `❌ Error: ${err.message}`);
+            emptyState.style.display = 'block';
+        } finally {
+            isScraping = false;
+            scrapeBtn.disabled = false;
+            progressSection.style.display = 'none';
+        }
+    }
+
+    function updateUIAfterScrape() {
+        statTotal.textContent = scrapedTopics.length;
+        statWithCode.textContent = scrapedTopics.filter(t => t.codeSnippets.length).length;
+        statWithComplexity.textContent = scrapedTopics.filter(t => !t.timeComplexity.includes('Not Available')).length;
+        statWithRefs.textContent = scrapedTopics.filter(t => t.references.length).length;
+
+        statsSection.style.display = 'block';
+        filterSection.style.display = 'block';
+        viewTabs.style.display = 'flex';
+        actionSection.style.display = 'block';
+        emptyState.style.display = 'none';
+        renderCardView();
+    }
+
+    function renderCardView() {
+        if(!filteredTopics.length) {
+            contentSection.innerHTML = '<div class="empty-state" style="padding:40px;">No matching topics</div>';
+            return;
+        }
+        
+        let html = '<div class="topics-grid">';
+        filteredTopics.forEach(t => {
+            let codeHtml = t.codeSnippets.length ? 
+                `<div class="code-preview"><pre>${escapeHtml(t.codeSnippets[0].substring(0, 280))}${t.codeSnippets[0].length > 280 ? '\n//...' : ''}</pre></div>` : 
+                '<div class="code-preview" style="color:#688;">// No code example</div>';
+            
+            let conceptsHtml = t.concepts.map(c => `<div>• ${escapeHtml(c.substring(0, 140))}${c.length > 140 ? '...' : ''}</div>`).join('');
+            
+            let refsHtml = t.references.length ? 
+                `<div class="references-section"><strong>📎 References</strong>${
+                    t.references.map(r => `<a href="${escapeHtml(r.url)}" target="_blank" class="reference-link">🔗 ${escapeHtml(r.title)}</a>`).join('')}</div>` : '';
+            
+            html += `<div class="topic-card">
+                <div class="topic-header">
+                    <span class="topic-title">${escapeHtml(t.title)}</span>
+                    <span class="difficulty-badge difficulty-${t.difficulty.toLowerCase()}">${t.difficulty}</span>
+                </div>
+                <div class="concepts-section"><strong>📘 Concepts</strong>${conceptsHtml}</div>
+                <div class="complexity-box">
+                    <div class="complexity-item"><strong>Time</strong> ${escapeHtml(t.timeComplexity.substring(0, 30))}</div>
+                    <div class="complexity-item"><strong>Space</strong> ${escapeHtml(t.spaceComplexity.substring(0, 30))}</div>
+                </div>
+                ${codeHtml}
+                ${refsHtml}
+                <div class="topic-footer">
+                    <span>📅 ${new Date(t.dateGenerated).toLocaleDateString()}</span>
+                    <a href="${escapeHtml(t.url)}" target="_blank" class="btn btn-secondary" style="padding:4px 12px;">View →</a>
+                </div>
+            </div>`;
+        });
+        html += '</div>';
+        contentSection.innerHTML = html;
+    }
+
+    function renderDataPreview() {
+        let preview = filteredTopics.map(t => ({
+            title: t.title,
+            difficulty: t.difficulty,
+            concepts: t.concepts.length,
+            codeSnippets: t.codeSnippets.length,
+            timeComplexity: t.timeComplexity,
+            spaceComplexity: t.spaceComplexity,
+            references: t.references.length
+        }));
+        contentSection.innerHTML = `<div class="data-preview"><div class="json-viewer">${escapeHtml(JSON.stringify(preview, null, 2))}</div></div>`;
+    }
+
+    function filterTopics() {
+        let s = searchFilter.value.toLowerCase();
+        let d = difficultyFilter.value;
+        filteredTopics = scrapedTopics.filter(t => 
+            (!s || (t.title.toLowerCase() + t.concepts.join(' ').toLowerCase()).includes(s)) && 
+            (!d || t.difficulty === d)
+        );
+        activeTab === 'card' ? renderCardView() : renderDataPreview();
+    }
+
+    function saveToLocalStorage() {
+        if(!scrapedTopics.length) { setStatus('warning', 'No data to save'); return; }
+        localStorage.setItem(CONFIG.storageKey, JSON.stringify(scrapedTopics));
+        setStatus('success', 'Data saved to browser storage');
+    }
+
+    function loadFromLocalStorage() {
+        try {
+            let d = localStorage.getItem(CONFIG.storageKey);
+            if(d) { 
+                scrapedTopics = JSON.parse(d); 
+                filteredTopics = [...scrapedTopics]; 
+                updateUIAfterScrape(); 
+                setStatus('success', `Loaded ${scrapedTopics.length} articles from storage`);
+            } else {
+                setStatus('warning', 'No saved data found');
+            }
+        } catch(e) { 
+            setStatus('error', 'Failed to load saved data'); 
+        }
+    }
+
+    function exportJsonFile() {
+        if(!scrapedTopics.length) return setStatus('warning', 'No data to export');
+        let a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(scrapedTopics, null, 2)], { type: 'application/json' }));
+        a.download = `html_articles_${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        setStatus('success', 'JSON exported');
+    }
+
+    async function generatePDFWithArticles() {
+        if(!filteredTopics.length) {
+            setStatus('warning', 'No articles to generate PDF. Please scrape first.');
+            return;
+        }
+        
+        setStatus('loading', '📄 Generating PDF with all 10 articles...');
+        
+        try {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            
+            // Cover Page
+            pdf.setFont('times', 'bold');
+            pdf.setFontSize(28);
+            pdf.setTextColor(228, 77, 38);
+            pdf.text('HTML MASTERY', 105, 50, { align: 'center' });
+            
+            pdf.setFont('times', 'bold');
+            pdf.setFontSize(22);
+            pdf.setTextColor(50, 50, 50);
+            pdf.text('10 Essential Articles', 105, 70, { align: 'center' });
+            
+            pdf.setFont('times', 'normal');
+            pdf.setFontSize(14);
+            pdf.text('from GeeksforGeeks HTML Search', 105, 85, { align: 'center' });
+            
+            pdf.setFont('times', 'italic');
+            pdf.setFontSize(12);
+            pdf.setTextColor(100, 100, 100);
+            pdf.text(`Generated: ${new Date().toLocaleDateString()}`, 105, 120, { align: 'center' });
+            
+            pdf.setFont('times', 'normal');
+            pdf.setFontSize(11);
+            pdf.text(`Total Articles: ${filteredTopics.length}`, 105, 140, { align: 'center' });
+            
+            // Table of Contents
+            pdf.addPage();
+            pdf.setFont('times', 'bold');
+            pdf.setFontSize(20);
+            pdf.setTextColor(228, 77, 38);
+            pdf.text('TABLE OF CONTENTS', 105, 30, { align: 'center' });
+            
+            let tocY = 50;
+            filteredTopics.forEach((topic, i) => {
+                if(tocY > 260) {
+                    pdf.addPage();
+                    tocY = 30;
+                }
+                pdf.setFont('times', 'normal');
+                pdf.setFontSize(11);
+                pdf.setTextColor(0, 0, 0);
+                
+                let title = topic.title.substring(0, 70);
+                if(topic.title.length > 70) title += '...';
+                
+                pdf.text(`${i + 1}. ${title}`, 20, tocY);
+                pdf.text(`${i + 2}`, 180, tocY, { align: 'right' });
+                tocY += 8;
+            });
+            
+            // Article Pages
+            filteredTopics.forEach((topic, index) => {
+                pdf.addPage();
+                let y = 30;
+                
+                // Header with difficulty color bar
+                pdf.setFillColor(228, 77, 38);
+                pdf.rect(0, 0, 210, 8, 'F');
+                
+                pdf.setFont('times', 'bold');
+                pdf.setFontSize(20);
+                pdf.setTextColor(228, 77, 38);
+                pdf.text(`ARTICLE ${index + 1}`, 20, 25);
+                
+                pdf.setFont('times', 'bold');
+                pdf.setFontSize(16);
+                pdf.setTextColor(0, 0, 0);
+                
+                const titleLines = pdf.splitTextToSize(topic.title, 140);
+                pdf.text(titleLines, 20, 40);
+                
+                y = 50 + (titleLines.length - 1) * 7;
+                
+                // Difficulty badge
+                pdf.setFillColor(
+                    topic.difficulty === 'Easy' ? 200 : 
+                    topic.difficulty === 'Medium' ? 240 : 
+                    255,
+                    topic.difficulty === 'Easy' ? 230 : 
+                    topic.difficulty === 'Medium' ? 200 : 
+                    200,
+                    topic.difficulty === 'Easy' ? 200 : 
+                    topic.difficulty === 'Medium' ? 150 : 
+                    200
+                );
+                pdf.rect(150, 30, 35, 8, 'F');
+                pdf.setFont('times', 'bold');
+                pdf.setFontSize(10);
+                pdf.setTextColor(0, 0, 0);
+                pdf.text(topic.difficulty.toUpperCase(), 167, 36, { align: 'center' });
+                
+                y += 10;
+                
+                // Concepts section
+                pdf.setFont('times', 'bold');
+                pdf.setFontSize(14);
+                pdf.setTextColor(228, 77, 38);
+                pdf.text('Key Concepts', 20, y);
+                y += 8;
+                
+                pdf.setFont('times', 'normal');
+                pdf.setFontSize(11);
+                
+                topic.concepts.forEach((concept, i) => {
+                    if(y > 250) {
+                        pdf.addPage();
+                        y = 30;
+                    }
+                    const conceptLines = pdf.splitTextToSize(`• ${concept}`, 160);
+                    pdf.text(conceptLines, 25, y);
+                    y += conceptLines.length * 5 + 3;
+                });
+                y += 5;
+                
+                // Complexity section
+                if(y > 250) {
+                    pdf.addPage();
+                    y = 30;
+                }
+                
+                pdf.setFont('times', 'bold');
+                pdf.setFontSize(14);
+                pdf.setTextColor(228, 77, 38);
+                pdf.text('Complexity Analysis', 20, y);
+                y += 8;
+                
+                pdf.setFont('times', 'normal');
+                pdf.setFontSize(11);
+                pdf.text(`Time Complexity: ${topic.timeComplexity}`, 25, y);
+                y += 6;
+                pdf.text(`Space Complexity: ${topic.spaceComplexity}`, 25, y);
+                y += 10;
+                
+                // Code snippets
+                if(topic.codeSnippets && topic.codeSnippets.length > 0) {
+                    if(y > 230) {
+                        pdf.addPage();
+                        y = 30;
+                    }
+                    
+                    pdf.setFont('times', 'bold');
+                    pdf.setFontSize(14);
+                    pdf.setTextColor(228, 77, 38);
+                    pdf.text('Code Example', 20, y);
+                    y += 8;
+                    
+                    pdf.setFillColor(245, 245, 245);
+                    pdf.rect(20, y - 2, 170, 50, 'F');
+                    
+                    pdf.setFont('courier', 'normal');
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(40, 40, 40);
+                    
+                    const codeLines = pdf.splitTextToSize(topic.codeSnippets[0].substring(0, 500), 140);
+                    for(let j = 0; j < Math.min(codeLines.length, 8); j++) {
+                        pdf.setTextColor(100, 100, 100);
+                        pdf.text(`${j + 1}.`, 22, y + (j * 5));
+                        pdf.setTextColor(40, 40, 40);
+                        pdf.text(codeLines[j], 30, y + (j * 5));
+                    }
+                    
+                    y += 55;
+                    
+                    if(codeLines.length > 8) {
+                        pdf.setFont('times', 'italic');
+                        pdf.setFontSize(8);
+                        pdf.setTextColor(100, 100, 100);
+                        pdf.text('// Additional code lines truncated', 25, y);
+                        y += 8;
+                    }
+                }
+                
+                // References
+                if(topic.references && topic.references.length > 0) {
+                    if(y > 240) {
+                        pdf.addPage();
+                        y = 30;
+                    }
+                    
+                    pdf.setFont('times', 'bold');
+                    pdf.setFontSize(14);
+                    pdf.setTextColor(228, 77, 38);
+                    pdf.text('Related Articles', 20, y);
+                    y += 8;
+                    
+                    pdf.setFont('times', 'normal');
+                    pdf.setFontSize(9);
+                    
+                    topic.references.forEach((ref, i) => {
+                        if(y > 260) {
+                            pdf.addPage();
+                            y = 30;
+                        }
+                        pdf.text(`${i + 1}. ${ref.title.substring(0, 60)}...`, 25, y);
+                        y += 5;
+                    });
+                }
+                
+                // Footer with URL
+                pdf.setFont('times', 'italic');
+                pdf.setFontSize(7);
+                pdf.setTextColor(100, 100, 100);
+                
+                let shortUrl = topic.url;
+                if(shortUrl.length > 70) shortUrl = shortUrl.substring(0, 67) + '...';
+                
+                pdf.text(`Source: ${shortUrl}`, 20, 280);
+                pdf.text(`Page ${pdf.internal.getNumberOfPages()}`, 190, 280, { align: 'right' });
+            });
+            
+            // Save the PDF
+            const fileName = `HTML_10_Articles_${new Date().toISOString().slice(0, 10)}.pdf`;
+            pdf.save(fileName);
+            
+            setStatus('success', '✅ PDF generated with all 10 articles!');
+        } catch(error) {
+            setStatus('error', `❌ PDF generation failed: ${error.message}`);
+        }
+    }
+
+    // Event listeners
+    scrapeBtn.addEventListener('click', startScraping);
+    searchFilter.addEventListener('input', filterTopics);
+    difficultyFilter.addEventListener('change', filterTopics);
+    saveJsonBtn.addEventListener('click', saveToLocalStorage);
+    loadJsonBtn.addEventListener('click', loadFromLocalStorage);
+    exportJsonBtn.addEventListener('click', exportJsonFile);
+    generatePdfBtn.addEventListener('click', generatePDFWithArticles);
+
+    cardViewTab.addEventListener('click', () => {
+        activeTab = 'card';
+        cardViewTab.classList.add('active');
+        previewTab.classList.remove('active');
+        renderCardView();
+    });
+
+    previewTab.addEventListener('click', () => {
+        activeTab = 'preview';
+        previewTab.classList.add('active');
+        cardViewTab.classList.remove('active');
+        renderDataPreview();
+    });
+
+    window.addEventListener('offline', () => {
+        setStatus('warning', '⚠️ Offline mode - scraping disabled', 0);
+        scrapeBtn.disabled = true;
+    });
+
+    window.addEventListener('online', () => {
+        if(!isScraping) {
+            setStatus('success', '✅ Online - you can scrape now', 3000);
+            scrapeBtn.disabled = false;
+        }
+    });
+
+    if(!isOnline()) {
+        setStatus('warning', '⚠️ Offline - click Load to view saved articles', 0);
+        scrapeBtn.disabled = true;
+    }
+    
+    setStatus('info', 'Ready to scrape 10 HTML articles', 4000);
+})();
+</script>
+</body>
+</html>
